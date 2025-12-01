@@ -6,7 +6,7 @@ from pathlib import Path
 
 load_dotenv()
 
-API_URL = os.getenv("STREAMLIT_API_URL", "http://localhost:8000")
+API_URL = os.getenv("STREAMLIT_API_URL", "https://immo-eliza-deployment-kved.onrender.com/")
 
 # Load logo
 logo_path = Path(__file__).parent / "assets" / "house_logo.svg"
@@ -94,7 +94,7 @@ with col2:
 
     state_of_building = st.selectbox(
         "State of Building",
-        ["Good", "To renovate", "To restore", "To be done up"],
+        ["-", "Good", "To renovate", "To restore", "To be done up"],
         help="Current condition of the property"
     )
 
@@ -159,7 +159,7 @@ if st.button("Predict Price", type="primary", use_container_width=True):
             "terrace": terrace,
             "number_of_facades": number_of_facades,
             "construction_year": construction_year,
-            "state_of_building": state_of_building.lower(),
+            "state_of_building": state_of_building.lower() if state_of_building != "-" else None,
             "kitchen": kitchen.lower()
         }
 

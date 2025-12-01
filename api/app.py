@@ -19,7 +19,7 @@ app = FastAPI(
     description=os.getenv("API_DESCRIPTION", "API for predicting real estate prices in Belgium")
 )
 
-origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8501").split(",")
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8501,https://immo-eliza-deployment-y7rqynulwrysqimvfq2jfg.streamlit.app/").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
