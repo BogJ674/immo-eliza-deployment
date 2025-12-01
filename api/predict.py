@@ -12,6 +12,7 @@ import numpy as np
 from pathlib import Path
 import joblib
 import warnings
+from utils import calculate_values_from_postal_code
 warnings.filterwarnings('ignore')
 
 
@@ -72,9 +73,6 @@ def create_sample_data():
             'primary_energy_consumption': 100,
             'property_type': 'Apartment',
             'cluster': 1,
-            'median_income_mun': 23.986,
-            'median_income_arr': 29.71,
-            'median_income_prv': 29.44
         },
         {
             # Family house in Brussels area
@@ -96,9 +94,6 @@ def create_sample_data():
             'primary_energy_consumption': 120,
             'property_type': 'House',
             'cluster': 1,
-            'median_income_mun': 30.0,
-            'median_income_arr': 28.5,
-            'median_income_prv': 28.0
         },
         {
             # Small apartment in Ghent
@@ -120,11 +115,15 @@ def create_sample_data():
             'primary_energy_consumption': 200,
             'property_type': 'Apartment',
             'cluster': 0,
-            'median_income_mun': 26.5,
-            'median_income_arr': 27.0,
-            'median_income_prv': 27.5
         }
     ]
+
+    # Calculate median income values from postal codes
+    for sample in samples:
+        calculated_values = calculate_values_from_postal_code(sample['postal_code'])
+        sample['median_income_mun'] = calculated_values['median_income_mun']
+        sample['median_income_arr'] = calculated_values['median_income_arr']
+        sample['median_income_prv'] = calculated_values['median_income_prv']
 
     return pd.DataFrame(samples)
 
@@ -137,26 +136,25 @@ def prepare_prediction_data(df, feature_names):
     -----------
     df : pd.DataFrame
         Input dataframe
-    feature_names : dict
-        Dictionary with 'numeric' and 'categorical' feature lists
+    feature_names : list
+        List of feature names expected by the model
 
     Returns:
     --------
     pd.DataFrame
         Prepared dataframe with all required features
     """
-    numeric_features = feature_names['numeric']
-    categorical_features = feature_names['categorical']
-
-    all_features = numeric_features + categorical_features
+    # feature_names is a list of all required features
+    all_features = feature_names
 
     # Add missing features with default values
     for feature in all_features:
         if feature not in df.columns:
-            if feature in numeric_features:
-                df[feature] = -1  # Default for numeric
+            # Set default values based on feature name patterns
+            if feature.startswith('property_type_'):
+                df[feature] = 0  # One-hot encoded features default to 0
             else:
-                df[feature] = 'Unknown'  # Default for categorical
+                df[feature] = 0  # Default numeric value
 
     # Ensure correct column order
     df = df[all_features]
@@ -189,6 +187,56 @@ def predict_prices(model, preprocessor, data):
     predictions = model.predict(data_processed)
 
     return predictions
+
+
+def predict(model, preprocessor, property_dict, feature_names=None):
+    """
+    Make a single prediction for a property.
+
+    Parameters:
+    -----------
+    model : sklearn model
+        Trained model
+    preprocessor : sklearn transformer
+        Fitted preprocessor (can be None if model doesn't require preprocessing)
+    property_dict : dict
+        Dictionary containing property features
+    feature_names : list, optional
+        List of feature names expected by the model
+
+    Returns:
+    --------
+    float
+        Predicted price
+    """
+    # If postal_code is provided but median income values are missing, calculate them
+    if 'postal_code' in property_dict:
+        if 'median_income_mun' not in property_dict or 'median_income_arr' not in property_dict or 'median_income_prv' not in property_dict:
+            calculated_values = calculate_values_from_postal_code(property_dict['postal_code'])
+            property_dict['median_income_mun'] = calculated_values['median_income_mun']
+            property_dict['median_income_arr'] = calculated_values['median_income_arr']
+            property_dict['median_income_prv'] = calculated_values['median_income_prv']
+
+    # Convert dict to DataFrame
+    df = pd.DataFrame([property_dict])
+
+    # The preprocessor handles one-hot encoding of property_type internally
+    # So we DON'T manually create one-hot encoded columns
+    # The feature_names list contains POST-preprocessing feature names (including one-hot encoded ones)
+
+    # If we have a preprocessor, use it directly with the raw features
+    if preprocessor is not None:
+        # The preprocessor expects raw features including 'property_type' as a categorical column
+        # It will transform and one-hot encode them automatically
+        prediction = predict_prices(model, preprocessor, df)[0]
+    else:
+        # Otherwise, try direct prediction
+        try:
+            prediction = model.predict(df)[0]
+        except Exception as e:
+            raise ValueError(f"Unable to make prediction. Model may require preprocessing. Error: {str(e)}")
+
+    return prediction
 
 
 def main():

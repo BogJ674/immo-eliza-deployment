@@ -1,7 +1,31 @@
+# Core dependencies
+fastapi==0.123.0
+uvicorn[standard]==0.38.0
+python-dotenv==1.2.1
+pydantic==2.12.5
+
+# Data science
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+scipy>=1.11.0
 joblib==1.5.2
-numpy==2.3.5
-pandas==2.3.3
-python-dateutil==2.9.0.post0
-pytz==2025.2
-six==1.17.0
-tzdata==2025.2
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+
+# Streamlit and dependencies
+streamlit>=1.28.0
+pyarrow>=7.0
+protobuf>=3.20.0
+altair>=4.0,<6
+cachetools>=4.0,<7
+gitpython>=3.0.7,<4
+packaging>=20,<26
+pillow>=7.1.0
+pydeck>=0.8.0b4,<1
+tenacity>=8.1.0,<10
+toml>=0.10.1,<2
+tornado>=6.0.3,<7
+
+# API utilities
+python-multipart==0.0.20
+requests>=2.31.0
