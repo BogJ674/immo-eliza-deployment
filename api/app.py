@@ -61,8 +61,8 @@ class PredictionResponse(BaseModel):
 async def startup_event():
     global model, preprocessor, feature_names
 
-    model_path = os.getenv("MODEL_PATH", "api/models/xgboost_all_data.pkl")
-    preprocessor_path = os.getenv("PREPROCESSOR_PATH", "api/models/preprocessor_all_data.pkl")
+    model_path = os.getenv("MODEL_PATH", "models/xgboost_all_data.pkl")
+    preprocessor_path = os.getenv("PREPROCESSOR_PATH", "models/preprocessor_all_data.pkl")
 
     logger.info(f"Loading model from {model_path}")
     logger.info(f"Loading preprocessor from {preprocessor_path}")
