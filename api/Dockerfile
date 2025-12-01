@@ -21,14 +21,8 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY api/ /app/api/
-
-# Copy .env file if exists (optional, can be overridden by environment variables)
-COPY .env* /app/ 2>/dev/null || true
-
-# Change to api directory
-WORKDIR /app/api
+# Copy application code (current directory is already api/)
+COPY . /app/
 
 # Expose port
 EXPOSE 8000
