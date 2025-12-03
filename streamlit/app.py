@@ -8,8 +8,9 @@ load_dotenv()
 
 API_URL = os.getenv("STREAMLIT_API_URL", "https://immo-eliza-deployment-kved.onrender.com/")
 
-# Load logo
+# Load logo and header image
 logo_path = Path(__file__).parent / "assets" / "house_logo.svg"
+header_image_path = Path(__file__).parent / "assets" / "file-6h8s.jpeg"
 
 st.set_page_config(
     page_title="Immo Eliza - Price Prediction",
@@ -17,12 +18,54 @@ st.set_page_config(
     layout="wide"
 )
 
-# Display logo and title
-col_logo, col_title = st.columns([1, 5])
-with col_logo:
-    if logo_path.exists():
-        st.image(str(logo_path))
-with col_title:
+# Header with background image
+if header_image_path.exists():
+    import base64
+
+    # Convert image to base64
+    with open(header_image_path, "rb") as img_file:
+        img_data = base64.b64encode(img_file.read()).decode()
+
+    # Create header with background image
+    st.markdown(
+        f"""
+        <style>
+        .header-container {{
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('data:image/jpeg;base64,{img_data}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 60px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }}
+        .header-title {{
+            color: white !important;
+            font-size: 3em;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }}
+        .header-subtitle {{
+            color: white !important;
+            font-size: 1.3em;
+            margin-top: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }}
+        /* Override Streamlit's default header color */
+        .header-container h1 {{
+            color: white !important;
+        }}
+        </style>
+        <div class="header-container">
+            <h1 class="header-title">Immo Eliza - Real Estate Price Prediction</h1>
+            <p class="header-subtitle">Get an instant price prediction for your Belgian property</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+else:
     st.title("Immo Eliza - Real Estate Price Prediction")
     st.markdown("Get an instant price prediction for your Belgian property")
 
@@ -94,8 +137,9 @@ with col2:
 
     state_of_building = st.selectbox(
         "State of Building",
-        ["-", "Good", "To renovate", "To restore", "To be done up"],
-        help="Current condition of the property"
+        ["Good", "To renovate", "To restore", "To be done up"],
+        index=None,
+        placeholder="Select state...",
     )
 
     number_of_facades = st.slider(

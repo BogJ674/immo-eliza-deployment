@@ -148,13 +148,7 @@ async def predict_price(data: PropertyData):
             "toilets": -1,
             "cadastral_income_house": -1,
             "postal_code": data.postal_code,
-            "property_type": data.type_of_property.capitalize(),
-            # These will be set to 0 by default, can be improved with postal code lookup
-            "median_income_mun": 0,
-            "median_income_arr": 0,
-            "median_income_prv": 0,
-            "median_price_house": 0,
-            "median_price_apartment": 0,
+            "property_type": data.type_of_property.capitalize()
         }
 
         predicted_price = predict(model, preprocessor, property_dict, feature_names)
