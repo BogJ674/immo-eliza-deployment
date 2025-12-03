@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 import logging
 
-from predict import predict, load_model_and_preprocessor
+from predict import predict, load_model_and_preprocessor, calculate_values_from_postal_code
 
 load_dotenv()
 
@@ -109,6 +109,8 @@ async def predict_price(data: PropertyData):
         # Map kitchen to has_equipped_kitchen
         has_equipped_kitchen = 1 if data.kitchen and data.kitchen.lower() == "installed" else -1
 
+        calculated_values = calculate_values_from_postal_code(data.postal_code)
+
         # Build property dict with all required features (use -1 for missing/unknown values as in training data)
         property_dict = {
             # Basic property features
@@ -148,7 +150,12 @@ async def predict_price(data: PropertyData):
             "toilets": -1,
             "cadastral_income_house": -1,
             "postal_code": data.postal_code,
-            "property_type": data.type_of_property.capitalize()
+            "property_type": data.type_of_property.capitalize(),
+            "median_income_mun": calculated_values["median_income_mun"],
+            "median_income_arr": calculated_values["median_income_arr"],
+            "median_income_prv": calculated_values["median_income_prv"],
+            "median_price_house": calculated_values["median_price_house"],
+            "median_price_apartment": calculated_values["median_price_apartment"],
         }
 
         predicted_price = predict(model, preprocessor, property_dict, feature_names)
