@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: immo-eliza-api
+    ports:
+      - "8000:8000"
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - API_TITLE=${API_TITLE:-Immo Eliza Price Prediction API}
+      - API_VERSION=${API_VERSION:-1.0.0}
+      - API_DESCRIPTION=${API_DESCRIPTION:-API for predicting real estate prices in Belgium}
+      - MODEL_PATH=${MODEL_PATH:-models/xgboost_all_data.pkl}
+      - PREPROCESSOR_PATH=${PREPROCESSOR_PATH:-models/preprocessor_all_data.pkl}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:8501,https://immo-eliza-deployment-y7rqynulwrysqimvfq2jfg.streamlit.app/}
+    volumes:
+      - ./api:/app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - immo-network
+
+networks:
+  immo-network:
+    driver: bridge
