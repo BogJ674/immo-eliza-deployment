@@ -81,14 +81,6 @@ st.sidebar.info(
     "Choose between single property prediction or batch processing of multiple properties."
 )
 
-st.sidebar.markdown("---")
-st.sidebar.header("Navigation")
-st.sidebar.markdown("""
-Use the sidebar to navigate between:
-- **Single Property**: Predict one property at a time
-- **Batch Prediction**: Upload a CSV file to predict multiple properties
-""")
-
 # Check API health
 st.sidebar.markdown("---")
 st.sidebar.header("API Status")
