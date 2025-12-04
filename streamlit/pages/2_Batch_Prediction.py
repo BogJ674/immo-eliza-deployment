@@ -96,9 +96,7 @@ if uploaded_file is not None:
             # Process predictions button
             st.header("3. Generate Predictions")
 
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.info(f"Ready to process {len(df)} properties")
+            st.info(f"Ready to process {len(df)} properties")
 
             if st.button("Generate Predictions", type="primary", use_container_width=True):
                 progress_bar = st.progress(0)
